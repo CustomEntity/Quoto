@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  keycloak:
+    image: bitnami/keycloak
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+    ports:
+      - 8080:8080
