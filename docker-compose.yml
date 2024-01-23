@@ -1,14 +1,33 @@
 version: '3.8'
 services:
+  postgresql:
+    image: postgres
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=keycloak
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
   keycloak:
     image: bitnami/keycloak
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    hostname: keycloak
     environment:
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=admin
+      - KEYCLOAK_ADMIN=master
+      - KEYCLOAK_ADMIN_PASSWORD=master
+      - KEYCLOAK_DATABASE_HOST=postgresql
+      - KEYCLOAK_DATABASE_PORT_NUMBER=5432
+      - KEYCLOAK_DATABASE_NAME=keycloak
+      - KEYCLOAK_DATABASE_USER=keycloak
+      - KEYCLOAK_DATABASE_PASSWORD=keycloak
     ports:
       - 8080:8080
+    depends_on:
+      - postgresql
+    volumes:
+      - ./scripts/setup-keycloak.sh:/setup-keycloak.sh
+    entrypoint: /setup-keycloak.sh
+volumes:
+  postgres_data:
